@@ -10,18 +10,49 @@
  
   // Define notice locations and properties
   const notices = [
-    { selector: 'div.form-action', id: 'custom-product-notice', position: 'before', extraStyle: 'width:520px;' },
+    { selector: 'div.form-action', id: 'custom-product-notice', position: 'before', desktopWidth: '520px' },
     { selector: 'li.previewCartTotals.grandTotal', id: 'custom-cart-total-notice', position: 'after' },
   ];
- 
+
+  function isMobile() {
+    return window.innerWidth <= 768;
+  }
+
+  function computeNoticeWidth() {
+    if (isMobile()) {
+      const ref = document.querySelector('#form-action-addToCart');
+      return (ref && ref.offsetWidth > 0) ? ref.offsetWidth + 'px' : null;
+    }
+    return '520px';
+  }
+
+  function getNoticeWidth() {
+    const w = computeNoticeWidth();
+    return w ? 'width:' + w + ';' : '';
+  }
+
+  var resizeTimeout;
+  function updateProductNoticeWidth() {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(function() {
+      const notice = document.getElementById('custom-product-notice');
+      if (!notice) return;
+      const w = computeNoticeWidth();
+      if (w) notice.style.width = w;
+    }, 100);
+  }
+
+  window.addEventListener('resize', updateProductNoticeWidth);
+
   function addNotices() {
-    notices.forEach(({ selector, id, position, extraStyle = '' }) => {
+    notices.forEach(({ selector, id, position, desktopWidth }) => {
       const target = document.querySelector(selector);
       // Only add notice if target exists and notice hasn't been added already
       if (target && !document.getElementById(id)) {
         const notice = document.createElement('div');
         notice.id = id;
-        notice.style.cssText = style + extraStyle;
+        const widthStyle = desktopWidth ? getNoticeWidth() : '';
+        notice.style.cssText = style + widthStyle;
        
         // Set the appropriate notice text based on the selector
         if (selector === 'div.form-action') {
