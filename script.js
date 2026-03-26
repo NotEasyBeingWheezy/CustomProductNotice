@@ -18,24 +18,28 @@
     return window.innerWidth <= 768;
   }
 
-  function getNoticeWidth() {
+  function computeNoticeWidth() {
     if (isMobile()) {
       const ref = document.querySelector('#form-action-addToCart');
-      if (ref) return 'width:' + ref.offsetWidth + 'px;';
-      return '';
+      return (ref && ref.offsetWidth > 0) ? ref.offsetWidth + 'px' : null;
     }
-    return 'width:520px;';
+    return '520px';
   }
 
+  function getNoticeWidth() {
+    const w = computeNoticeWidth();
+    return w ? 'width:' + w + ';' : '';
+  }
+
+  var resizeTimeout;
   function updateProductNoticeWidth() {
-    const notice = document.getElementById('custom-product-notice');
-    if (!notice) return;
-    if (isMobile()) {
-      const ref = document.querySelector('#form-action-addToCart');
-      if (ref) notice.style.width = ref.offsetWidth + 'px';
-    } else {
-      notice.style.width = '520px';
-    }
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(function() {
+      const notice = document.getElementById('custom-product-notice');
+      if (!notice) return;
+      const w = computeNoticeWidth();
+      if (w) notice.style.width = w;
+    }, 100);
   }
 
   window.addEventListener('resize', updateProductNoticeWidth);
