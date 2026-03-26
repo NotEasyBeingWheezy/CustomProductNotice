@@ -18,9 +18,24 @@
     return window.innerWidth <= 768;
   }
 
+  function getNoticeWidth() {
+    if (isMobile()) {
+      const ref = document.querySelector('#form-action-addToCart');
+      if (ref) return 'width:' + ref.offsetWidth + 'px;';
+      return '';
+    }
+    return 'width:520px;';
+  }
+
   function updateProductNoticeWidth() {
     const notice = document.getElementById('custom-product-notice');
-    if (notice) notice.style.width = isMobile() ? '100%' : '520px';
+    if (!notice) return;
+    if (isMobile()) {
+      const ref = document.querySelector('#form-action-addToCart');
+      if (ref) notice.style.width = ref.offsetWidth + 'px';
+    } else {
+      notice.style.width = '520px';
+    }
   }
 
   window.addEventListener('resize', updateProductNoticeWidth);
@@ -32,7 +47,7 @@
       if (target && !document.getElementById(id)) {
         const notice = document.createElement('div');
         notice.id = id;
-        const widthStyle = desktopWidth ? (isMobile() ? 'width:100%;' : `width:${desktopWidth};`) : '';
+        const widthStyle = desktopWidth ? getNoticeWidth() : '';
         notice.style.cssText = style + widthStyle;
        
         // Set the appropriate notice text based on the selector
